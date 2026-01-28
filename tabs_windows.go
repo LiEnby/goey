@@ -252,7 +252,24 @@ func (w *TabsElement) updateChildren(children []TabItem) error {
 		}
 	}
 
+	// set new children 
 	w.widgets = children
+	
+	// update children 
+	child, err := base.DiffChild(w.parent, w.child, w.widgets[w.value].Child)
+	if err != nil {
+		panic("Unhandled error!")
+	}
+	if child != nil {
+		child.SetOrder(w.Hwnd)
+		child.Layout(base.Tight(base.Size{
+			Width:  w.cachedBounds.Dx(),
+			Height: w.cachedBounds.Dy(),
+		}))
+		child.SetBounds(w.cachedBounds)
+		win.InvalidateRect(win.GetParent(w.Hwnd), nil, false)
+	}
+
 	return nil
 }
 
